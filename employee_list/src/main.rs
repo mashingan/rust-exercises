@@ -1,0 +1,91 @@
+use std::collections::HashMap;
+use std::io;
+
+fn main() {
+    let mut employee: HashMap<String, String> = HashMap::new();
+    loop {
+        //print!(">>");
+        let mut command = String::new();
+        io::stdin().read_line(&mut command)
+            .expect("Failed to read line");
+        let command = command.trim();
+        let cmds: Vec<&str> = command.split(' ').collect();
+        if cmds.len() < 1 {
+            print_help();
+            continue;
+        }
+        let cmd = &cmds[0].to_lowercase();
+        if cmd == "help" {
+            print_help();
+        } else if cmd == "list" {
+            //println!("to list");
+            if cmds.len() != 2 {
+                list_all_employee(&employee);
+            } else {
+                let dept = &cmds[1];
+                list_employee_in(dept, &employee);
+            }
+        } else if cmd == "add" {
+            //println!("to add");
+            if cmds.len() != 4 {
+                println!("Please use add command correctly: \
+add <Name> to <dept>");
+                continue;
+            }
+            let name = &cmds[1];
+            let dept = &cmds[3];
+            employee.insert(name.to_string(), dept.to_string());
+            println!("{} is added to {}", name, dept);
+        } else if cmd == "quit" {
+            println!("Thank you.\nGood bye");
+            break;
+        } else {
+            print_help();
+        }
+    }
+}
+
+fn list_employee_in(dept: &str, list: &HashMap<String, String>) {
+    let mut emplist = Vec::new();
+    for (empl, indept) in list {
+        if dept == indept {
+            emplist.push(empl);
+        }
+    }
+    emplist.sort();
+    for emp in &emplist {
+        println!("{}", emp);
+    }
+}
+
+fn list_all_employee(list: &HashMap<String, String>) {
+    let mut depts = Vec::new();
+    for dept in list.values() {
+        depts.push(dept);
+    }
+    depts.sort();
+    for dept in &depts {
+        println!("Employee in {}:", dept);
+        list_employee_in(dept, list);
+        println!("------------------");
+    }
+}
+
+fn print_help() {
+    let info = r"Available command:
+1. [Add|add] <name> to <dept>
+  To add the <name> of employee to <dept>.
+  If the employee already available in that <dept>, it will update instead.
+  e.g.:
+  add Mashingan to research
+
+2. [List|list] [<dept>|all|]
+  List the employee available in given <dept>, if the argument is all or
+  nothing, it will list all available employee in all depts.
+  e.g.:
+  list research
+  >>Mashingan in research
+3. [Quit|quit|q|Exit|exit]
+  To quit the program.";
+    println!("{}", info);
+}
