@@ -11,7 +11,7 @@ fn average(vec: &Vec<i32>) -> i32 {
     for el in vec {
         sum += *el;
     }
-    sum
+    sum / vec.len()
 }
 
 fn median(vec: &Vec<i32>) -> i32 {
