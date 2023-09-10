@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::io;
 
 fn main() {
-    let mut employee: HashMap<String, String> = HashMap::new();
+    let mut employee: HashMap<String, Vec<String>> = HashMap::new();
     loop {
         //print!(">>");
         let mut command = String::new();
@@ -34,8 +34,18 @@ add <Name> to <dept>");
             }
             let name = &cmds[1];
             let dept = &cmds[3];
-            employee.insert(name.to_string(), dept.to_string());
-            println!("{} is added to {}", name, dept);
+            //employee.insert(name.to_string(), dept.to_string());
+            let dept = dept.to_string();
+            let name = name.to_string();
+            println!("{} is going to be added to {}", name, dept);
+            match employee.get_mut(&dept) {
+                Some(members) => members.push(name),
+                None => {
+                    let newlist = vec![name];
+                    let _ = employee.insert(dept, newlist);
+                }
+            }
+            println!("success");
         } else if cmd == "quit" {
             println!("Thank you.\nGood bye");
             break;
@@ -45,28 +55,23 @@ add <Name> to <dept>");
     }
 }
 
-fn list_employee_in(dept: &str, list: &HashMap<String, String>) {
-    let mut emplist = Vec::new();
-    for (empl, indept) in list {
-        if dept == indept {
-            emplist.push(empl);
-        }
-    }
-    emplist.sort();
-    for emp in &emplist {
-        println!("{}", emp);
+fn list_employee_in(dept: &str, list: &HashMap<String, Vec<String>>) {
+    match list.get(dept) {
+        Some(members) => {
+            for emp in members {
+                println!("{}", emp);
+            }
+        },
+        None => {}
     }
 }
 
-fn list_all_employee(list: &HashMap<String, String>) {
-    let mut depts = Vec::new();
-    for dept in list.values() {
-        depts.push(dept);
-    }
-    depts.sort();
-    for dept in &depts {
+fn list_all_employee(list: &HashMap<String, Vec<String>>) {
+    for (dept, members) in list.iter() {
         println!("Employee in {}:", dept);
-        list_employee_in(dept, list);
+        for member in members {
+            println!("{}", member);
+        }
         println!("------------------");
     }
 }
